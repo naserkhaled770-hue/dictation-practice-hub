@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dictation Practice Hub</title>
+    <!-- Tailwind CSS for modern responsive styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Fredoka, Inter, & Poppins (Extra Bold for crystal clear phone reading) -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Inter:wght@400;600;700;800;900&family=Poppins:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        fun: ['Fredoka', 'sans-serif'],
+                        poppins: ['Poppins', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #fdf4ff 0%, #fae8ff 50%, #e0e7ff 100%);
+            min-height: 100vh;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .fun-font {
+            font-family: 'Fredoka', sans-serif;
+        }
+        /* Poppins font replacing handwriting entirely for crystal clear phone readability */
+        .clear-word-font {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 800;
+            letter-spacing: -0.01em;
+        }
+        button, input {
+            touch-action: manipulation;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-full text-slate-800">
+
+    <header class="bg-gradient-to-r from-fuchsia-600 via-purple-600 to-indigo-600 text-white shadow-xl sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center text-2xl shadow-inner animate-bounce">
+                        🎧
+                    </div>
+                    <div>
+                        <h1 class="fun-font text-2xl font-bold tracking-wide">Dictation Hub</h1>
+                        <p class="text-xs text-fuchsia-200 font-medium">Crystal Clear Audio & Practice!</p>
+                    </div>
+                </div>
+                <!-- Smartphone Share Button for Mobile -->
+                <button onclick="showShareModal()" class="sm:hidden bg-white/20 hover:bg-white/30 px-3 py-2 rounded-xl text-white text-xs font-bold flex items-center gap-1.5 active:scale-95 shadow-md border border-white/30">
+                    <i class="fa-solid fa-link text-sm"></i> Phone Link
+                </button>
+            </div>
+            
+            <!-- Navigation Tabs -->
+            <div class="flex items-center gap-2 w-full sm:w-auto justify-between">
+                <nav class="flex bg-black/20 p-1.5 rounded-2xl backdrop-blur-md flex-1 sm:flex-initial justify-center gap-1">
+                    <button onclick="switchTab('listen')" id="nav-listen" class="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all duration-200 flex items-center justify-center gap-2 bg-white text-fuchsia-700 shadow-md">
+                        <i class="fa-solid fa-volume-high text-base"></i> Words
+                    </button>
+                    <button onclick="switchTab('game')" id="nav-game" class="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all duration-200 flex items-center justify-center gap-2 text-fuchsia-100 hover:text-white">
+                        <i class="fa-solid fa-gamepad text-base"></i> Games
+                    </button>
+                    <button onclick="switchTab('exercises')" id="nav-exercises" class="flex-1 sm:flex-initial px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all duration-200 flex items-center justify-center gap-2 text-fuchsia-100 hover:text-white">
+                        <i class="fa-solid fa-pencil text-base"></i> Exercises
+                    </button>
+                </nav>
+                <!-- Desktop Smartphone Hyperlink Button -->
+                <button onclick="showShareModal()" class="hidden sm:flex bg-white/20 hover:bg-white/30 px-3 py-2.5 rounded-xl text-white text-xs font-bold items-center gap-1.5 active:scale-95 shadow-md border border-white/30 shrink-0" title="Open on Smartphone">
+                    <i class="fa-solid fa-link"></i> Phone Link
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-4xl w-full mx-auto p-4 sm:p-6 mb-16">
+
+        <!-- TAB 1: LISTEN & WORDS -->
+        <section id="tab-listen" class="tab-content space-y-6">
+            <div class="bg-gradient-to-br from-pink-100 via-fuchsia-100 to-indigo-100 rounded-3xl p-5 sm:p-8 shadow-2xl border-4 border-fuchsia-300">
+                <div class="text-center max-w-lg mx-auto mb-6">
+                    <span class="bg-gradient-to-r from-pink-500 via-fuchsia-500 to-purple-500 text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider shadow-sm">✨ Vocabulary List ✨</span>
+                    <h2 class="fun-font text-3xl font-extrabold text-slate-900 mt-2">Tap Any Word to Listen!</h2>
+                    <p class="text-slate-700 text-sm mt-1 font-medium">Crystal clear mobile speech synthesis for perfect student pronunciation.</p>
+                </div>
+                <!-- Word Cards Grid -->
+                <div id="word-cards-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-5"></div>
+            </div>
+        </section>
+
+        <!-- TAB 2: INTERACTIVE GAMES FOR RETENTION -->
+        <section id="tab-game" class="tab-content hidden space-y-6">
+            <div class="bg-gradient-to-br from-amber-100 via-orange-100 to-rose-100 rounded-3xl p-5 sm:p-8 shadow-2xl border-4 border-amber-400 text-center">
+                <div class="max-w-md mx-auto mb-6">
+                    <span class="bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider shadow-sm">🎮 Word Retention Arcade 🎮</span>
+                    <h2 class="fun-font text-3xl font-extrabold text-slate-900 mt-2">Choose a Fun Game!</h2>
+                    <p class="text-slate-700 text-sm mt-1 font-medium">Fun challenges designed to help students memorize and retain words!</p>
+                </div>
+
+                <!-- Game Selector Menu -->
+                <div id="game-menu" class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl mx-auto py-2">
+                    <button onclick="startSpecificGame('catch')" class="p-5 bg-gradient-to-br from-amber-400 to-orange-500 text-white rounded-3xl shadow-xl active:scale-95 hover:scale-105 transition-all flex items-center gap-4 text-left group border-4 border-white">
+                        <div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center text-3xl shrink-0 shadow-inner group-hover:rotate-12 transition-transform">🎧</div>
+                        <div>
+                            <h3 class="fun-font text-xl font-bold">Listen & Catch</h3>
+                            <p class="text-xs text-amber-100 mt-0.5">Hear audio & tap the correct card!</p>
+                        </div>
+                    </button>
+                    <button onclick="startSpecificGame('bubble')" class="p-5 bg-gradient-to-br from-pink-500 to-fuchsia-600 text-white rounded-3xl shadow-xl active:scale-95 hover:scale-105 transition-all flex items-center gap-4 text-left group border-4 border-white">
+                        <div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center text-3xl shrink-0 shadow-inner group-hover:rotate-12 transition-transform">🫧</div>
+                        <div>
+                            <h3 class="fun-font text-xl font-bold">Bubble Pop Match</h3>
+                            <p class="text-xs text-pink-100 mt-0.5">Pop bubbles matching the sound!</p>
+                        </div>
+                    </button>
+                    <button onclick="startSpecificGame('flashcard')" class="p-5 bg-gradient-to-br from-emerald-400 to-teal-600 text-white rounded-3xl shadow-xl active:scale-95 hover:scale-105 transition-all flex items-center gap-4 text-left group border-4 border-white">
+                        <div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center text-3xl shrink-0 shadow-inner group-hover:rotate-12 transition-transform">🃏</div>
+                        <div>
+                            <h3 class="fun-font text-xl font-bold">Memory Flip Cards</h3>
+                            <p class="text-xs text-emerald-100 mt-0.5">Match picture with spoken voice!</p>
+                        </div>
+                    </button>
+                    <button onclick="startSpecificGame('speed')" class="p-5 bg-gradient-to-br from-blue-500 to-indigo-600 text-white rounded-3xl shadow-xl active:scale-95 hover:scale-105 transition-all flex items-center gap-4 text-left group border-4 border-white">
+                        <div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center text-3xl shrink-0 shadow-inner group-hover:rotate-12 transition-transform">⚡</div>
+                        <div>
+                            <h3 class="fun-font text-xl font-bold">Speed Quiz Blitz</h3>
+                            <p class="text-xs text-blue-100 mt-0.5">Fast-paced spelling true or false!</p>
+                        </div>
+                    </button>
+                    <button onclick="startSpecificGame('puzzle')" class="p-5 bg-gradient-to-br from-purple-500 to-pink-600 text-white rounded-3xl shadow-xl active:scale-95 hover:scale-105 transition-all flex items-center gap-4 text-left group border-4 border-white sm:col-span-2">
+                        <div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center text-3xl shrink-0 shadow-inner group-hover:rotate-12 transition-transform">🧩</div>
+                        <div>
+                            <h3 class="fun-font text-xl font-bold">Letter Puzzle Builder</h3>
+                            <p class="text-xs text-purple-100 mt-0.5">Assemble scrambled letter blocks to secure memory retention!</p>
+                        </div>
+                    </button>
+                </div>
+
+                <!-- Active Game Container -->
+                <div id="game-active-area" class="hidden space-y-6">
+                    <div class="flex justify-between items-center bg-white/90 backdrop-blur px-5 py-3 rounded-2xl shadow-md border-2 border-amber-300">
+                        <button onclick="returnToGameMenu()" class="text-xs font-bold text-amber-800 bg-amber-200 hover:bg-amber-300 px-3 py-2 rounded-xl transition-all flex items-center gap-1 active:scale-95">
+                            <i class="fa-solid fa-arrow-left"></i> Arcade Menu
+                        </button>
+                        <div class="flex gap-4">
+                            <div>
+                                <span class="text-[10px] text-amber-700 block font-bold">SCORE</span>
+                                <span id="game-score" class="fun-font font-bold text-xl text-amber-600">0</span>
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-orange-700 block font-bold">STREAK</span>
+                                <span id="game-streak" class="fun-font font-bold text-xl text-orange-500">🔥 0</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="game-stage-content"></div>
+                </div>
+
+                <div id="game-over-screen" class="hidden py-8 space-y-6">
+                    <div class="w-24 h-24 bg-gradient-to-tr from-emerald-400 to-teal-500 text-white rounded-full flex items-center justify-center text-4xl mx-auto shadow-lg animate-bounce">
+                        🏆
+                    </div>
+                    <div>
+                        <h3 class="fun-font text-3xl font-extrabold text-slate-800">Fantastic Word Mastery!</h3>
+                        <p class="text-slate-700 mt-2 font-medium">You earned a final score of <span id="final-score" class="fun-font font-bold text-2xl text-amber-600">0</span> points!</p>
+                    </div>
+                    <div class="flex justify-center gap-4">
+                        <button onclick="returnToGameMenu()" class="bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold px-6 py-3.5 rounded-2xl shadow-lg active:scale-95 transition-all">
+                            Choose Another Game
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: EXERCISES -->
+        <section id="tab-exercises" class="tab-content hidden space-y-6">
+            <div class="bg-gradient-to-br from-emerald-100 via-teal-100 to-cyan-100 rounded-3xl p-5 sm:p-8 shadow-2xl border-4 border-emerald-300">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 pb-4 border-b border-emerald-200">
+                    <div>
+                        <span class="bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider shadow-sm">📝 Practice Drills 📝</span>
+                        <h2 class="fun-font text-2xl font-extrabold text-slate-900 mt-1">Dictation Exercises</h2>
+                    </div>
+                    <!-- Exercise Sub-tabs -->
+                    <div class="flex bg-white/90 p-1.5 rounded-2xl shadow-inner w-full sm:w-auto border border-emerald-200 gap-1">
+                        <button onclick="switchExerciseMode('spell')" id="ex-btn-spell" class="flex-1 sm:flex-initial px-3 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-md transition-all">Listen & Spell</button>
+                        <button onclick="switchExerciseMode('missing')" id="ex-btn-missing" class="flex-1 sm:flex-initial px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-slate-900 transition-all">Missing Letters</button>
+                        <button onclick="switchExerciseMode('unscramble')" id="ex-btn-unscramble" class="flex-1 sm:flex-initial px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-slate-900 transition-all">Unscramble</button>
+                    </div>
+                </div>
+
+                <div id="exercise-container" class="space-y-6"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FEEDBACK MODAL / TOAST -->
+    <div id="feedback-modal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-sm w-full text-center space-y-4 shadow-2xl border-4 border-fuchsia-300" id="modal-content-box">
+            <div id="modal-icon" class="w-20 h-20 rounded-full mx-auto flex items-center justify-center text-4xl shadow-inner"></div>
+            <h3 id="modal-title" class="fun-font text-2xl font-extrabold text-slate-800"></h3>
+            <p id="modal-desc" class="text-slate-700 text-base font-medium"></p>
+            <button onclick="closeModal()" class="w-full bg-gradient-to-r from-fuchsia-600 via-purple-600 to-indigo-600 text-white font-bold py-3.5 rounded-2xl shadow-lg active:scale-95 transition-all text-base">Continue</button>
+        </div>
+    </div>
+
+    <!-- SHARE / HYPERLINK MODAL FOR SMARTPHONES -->
+    <div id="share-modal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-sm w-full text-center space-y-4 shadow-2xl border-4 border-indigo-300">
+            <div class="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-2xl mx-auto flex items-center justify-center text-3xl shadow-inner">
+                <i class="fa-solid fa-link"></i>
+            </div>
+            <h3 class="fun-font text-2xl font-extrabold text-slate-800">Smartphone Hyperlink</h3>
+            <p class="text-slate-600 text-sm">Copy this https link or click below to open directly on student smartphones and tablets:</p>
+            <div class="bg-slate-100 p-3 rounded-xl border border-slate-300 flex items-center justify-between gap-2">
+                <input type="text" id="share-link-input" readonly class="bg-transparent text-xs text-slate-700 font-mono w-full outline-none select-all" value="" />
+                <button onclick="copyShareLink()" class="bg-indigo-600 text-white text-xs px-3 py-2 rounded-lg font-bold shrink-0 active:scale-95">Copy</button>
+            </div>
+            <a id="direct-open-link" href="#" target="_blank" class="block w-full bg-gradient-to-r from-indigo-600 to-fuchsia-600 text-white font-bold py-3 rounded-xl shadow-md active:scale-95 text-sm text-center">Open in New Tab</a>
+            <button onclick="closeShareModal()" class="w-full bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-2.5 rounded-xl active:scale-95 text-xs">Close</button>
+        </div>
+    </div>
+
+    <script>
+        // List of the 8 assigned dictation words: Arabic starts with a capital letter, others lowercase, volleyball as one word
+        const wordsData = [
+            { id: 1, word: "Arabic", category: "Subject", color: "from-pink-500 to-rose-500", bgLight: "bg-pink-100", emoji: "📖" },
+            { id: 2, word: "maths", category: "Subject", color: "from-purple-500 to-indigo-500", bgLight: "bg-purple-100", emoji: "🔢" },
+            { id: 3, word: "science", category: "Subject", color: "from-blue-500 to-cyan-500", bgLight: "bg-blue-100", emoji: "🔬" },
+            { id: 4, word: "sums", category: "Subject", color: "from-teal-500 to-emerald-500", bgLight: "bg-teal-100", emoji: "➕" },
+            { id: 5, word: "volleyball", category: "Sports", color: "from-amber-500 to-yellow-500", bgLight: "bg-amber-100", emoji: "🏐" },
+            { id: 6, word: "tennis", category: "Sports", color: "from-orange-500 to-amber-600", bgLight: "bg-orange-100", emoji: "🎾" },
+            { id: 7, word: "horse riding", category: "Sports", color: "from-rose-500 to-pink-600", bgLight: "bg-rose-100", emoji: "🐎" },
+            { id: 8, word: "basketball", category: "Sports", color: "from-indigo-600 to-violet-600", bgLight: "bg-indigo-100", emoji: "🏀" }
+        ];
+
+        let currentTab = 'listen';
+        let currentExerciseMode = 'spell';
+        let availableVoices = [];
+
+        // Load voices and sort to prioritize highest quality natural/enhanced speakers on mobile & desktop
+        function loadVoices() {
+            if ('speechSynthesis' in window) {
+                availableVoices = window.speechSynthesis.getVoices() || [];
+                availableVoices.sort((a, b) => {
+                    const scoreA = (a.name.includes('Natural') || a.name.includes('Google') || a.name.includes('Samantha') || a.name.includes('Enhanced') || a.name.includes('Siri') || a.name.includes('Premium')) ? 3 : (a.lang.startsWith('en') ? 1 : 0);
+                    const scoreB = (b.name.includes('Natural') || b.name.includes('Google') || b.name.includes('Samantha') || b.name.includes('Enhanced') || b.name.includes('Siri') || b.name.includes('Premium')) ? 3 : (b.lang.startsWith('en') ? 1 : 0);
+                    return scoreB - scoreA;
+                });
+            }
+        }
+        if ('speechSynthesis' in window) {
+            loadVoices();
+            window.speechSynthesis.onvoiceschanged = loadVoices;
+        }
+
+        // Web Audio API sound effects generator
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playSound(type) {
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            const now = audioCtx.currentTime;
+
+            if (type === 'click') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(500, now);
+                osc.frequency.exponentialRampToValueAtTime(900, now + 0.08);
+                gainNode.gain.setValueAtTime(0.12, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+                osc.start(now);
+                osc.stop(now + 0.08);
+            } else if (type === 'success') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(523.25, now);
+                osc.frequency.setValueAtTime(659.25, now + 0.1);
+                osc.frequency.setValueAtTime(783.99, now + 0.2);
+                osc.frequency.setValueAtTime(1046.50, now + 0.3);
+                gainNode.gain.setValueAtTime(0.2, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.6);
+                osc.start(now);
+                osc.stop(now + 0.6);
+            } else if (type === 'error') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(220, now);
+                osc.frequency.setValueAtTime(150, now + 0.15);
+                gainNode.gain.setValueAtTime(0.15, now);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            }
+        }
+
+        // ADVANCED PRONUNCIATION FUNCTION WITH BEST AVAILABLE NATURAL BROWSER VOICE
+        function speakWord(text) {
+            if (!('speechSynthesis' in window)) return;
+            
+            window.speechSynthesis.cancel();
+            
+            if (availableVoices.length === 0) {
+                loadVoices();
+            }
+
+            // Pick the absolute best natural/enhanced English voice available on student browser/mobile
+            let selectedVoice = availableVoices.find(v => v.lang.startsWith('en') && (v.name.includes('Natural') || v.name.includes('Google') || v.name.includes('Samantha') || v.name.includes('Siri') || v.name.includes('Enhanced') || v.name.includes('Premium'))) ||
+                                 availableVoices.find(v => v.lang.startsWith('en-US')) ||
+                                 availableVoices.find(v => v.lang.startsWith('en')) ||
+                                 availableVoices[0];
+
+            const utterance = new SpeechSynthesisUtterance(text);
+            if (selectedVoice) {
+                utterance.voice = selectedVoice;
+            }
+            
+            utterance.rate = 0.72;   // Gentle, articulate pacing for clear smartphone pronunciation
+            utterance.pitch = 1.12;  // Warm, enthusiastic tone
+            utterance.volume = 1.0;
+
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function switchTab(tabId) {
+            playSound('click');
+            currentTab = tabId;
+            
+            ['listen', 'game', 'exercises'].forEach(t => {
+                const el = document.getElementById(`tab-${t}`);
+                const nav = document.getElementById(`nav-${t}`);
+                if (t === tabId) {
+                    el.classList.remove('hidden');
+                    nav.className = "flex-1 sm:flex-initial px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all duration-200 flex items-center justify-center gap-2 bg-white text-fuchsia-700 shadow-md";
+                } else {
+                    el.classList.add('hidden');
+                    nav.className = "flex-1 sm:flex-initial px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all duration-200 flex items-center justify-center gap-2 text-fuchsia-100 hover:text-white";
+                }
+            });
+
+            if (tabId === 'exercises') {
+                initExercise();
+            }
+        }
+
+        function renderListenGrid() {
+            const grid = document.getElementById('word-cards-grid');
+            if (!grid) return;
+            grid.innerHTML = '';
+            wordsData.forEach(item => {
+                const card = document.createElement('div');
+                card.className = `${item.bgLight} p-6 sm:p-7 rounded-3xl border-4 border-white shadow-xl active:scale-95 hover:scale-102 transition-all flex flex-col items-center text-center cursor-pointer group`;
+                card.onclick = () => {
+                    playSound('click');
+                    speakWord(item.word);
+                    card.classList.add('scale-105', 'ring-4', 'ring-fuchsia-500');
+                    setTimeout(() => card.classList.remove('scale-105', 'ring-4', 'ring-fuchsia-500'), 400);
+                };
+                card.innerHTML = `
+                    <div class="w-20 h-20 bg-white rounded-3xl shadow-md flex items-center justify-center text-4xl mb-4 group-hover:rotate-12 transition-transform">
+                        ${item.emoji}
+                    </div>
+                    <span class="text-xs font-extrabold uppercase tracking-widest bg-white/95 px-4 py-1.5 rounded-full shadow-xs text-slate-800 mb-3">${item.category}</span>
+                    <h3 class="clear-word-font text-5xl sm:text-6xl text-slate-900 tracking-tight mb-4">${item.word}</h3>
+                    <div class="mt-auto inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-white bg-gradient-to-r ${item.color} px-6 py-3 rounded-2xl shadow-md group-hover:scale-105 transition-all">
+                        <i class="fa-solid fa-volume-high"></i> Listen & Repeat
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // MULTI-GAME ARCADE LOGIC
+        let activeGameType = 'catch';
+        let gameScore = 0;
+        let gameStreak = 0;
+        let currentGameIndex = 0;
+        let gameQuestionsQueue = [];
+        let currentGameWord = null;
+
+        function startSpecificGame(type) {
+            playSound('click');
+            activeGameType = type;
+            gameScore = 0;
+            gameStreak = 0;
+            currentGameIndex = 0;
+            gameQuestionsQueue = [...wordsData].sort(() => Math.random() - 0.5);
+
+            document.getElementById('game-menu').classList.add('hidden');
+            document.getElementById('game-over-screen').classList.add('hidden');
+            document.getElementById('game-active-area').classList.remove('hidden');
+
+            loadGameStage();
+        }
+
+        function returnToGameMenu() {
+            playSound('click');
+            document.getElementById('game-active-area').classList.add('hidden');
+            document.getElementById('game-over-screen').classList.add('hidden');
+            document.getElementById('game-menu').classList.remove('hidden');
+        }
+
+        function loadGameStage() {
+            document.getElementById('game-score').innerText = gameScore;
+            document.getElementById('game-streak').innerText = `🔥 ${gameStreak}`;
+
+            if (currentGameIndex >= 6) {
+                document.getElementById('game-active-area').classList.add('hidden');
+                document.getElementById('game-over-screen').classList.remove('hidden');
+                document.getElementById('final-score').innerText = gameScore;
+                playSound('success');
+                return;
+            }
+
+            currentGameWord = gameQuestionsQueue[currentGameIndex];
+            const stageArea = document.getElementById('game-stage-content');
+            stageArea.innerHTML = '';
+
+            if (activeGameType === 'catch') {
+                renderCatchGame(stageArea);
+            } else if (activeGameType === 'bubble') {
+                renderBubbleGame(stageArea);
+            } else if (activeGameType === 'flashcard') {
+                renderFlashcardGame(stageArea);
+            } else if (activeGameType === 'speed') {
+                renderSpeedGame(stageArea);
+            } else if (activeGameType === 'puzzle') {
+                renderPuzzleGame(stageArea);
+            }
+        }
+
+        // GAME 1: LISTEN & CATCH
+        function renderCatchGame(container) {
+            speakWord(currentGameWord.word);
+            let distractors = wordsData.filter(w => w.word !== currentGameWord.word).sort(() => Math.random() - 0.5).slice(0, 3);
+            let choices = [...distractors, currentGameWord].sort(() => Math.random() - 0.5);
+
+            container.innerHTML = `
+                <div class="space-y-5">
+                    <div class="py-5 bg-gradient-to-r from-amber-200 to-orange-200 rounded-3xl border-3 border-dashed border-amber-400 flex flex-col items-center justify-center gap-2 shadow-inner">
+                        <span class="text-xs font-bold text-amber-900 uppercase tracking-widest bg-white px-4 py-1.5 rounded-full shadow-xs">Round ${currentGameIndex + 1} of 6 — Listen:</span>
+                        <button onclick="speakWord('${currentGameWord.word}')" class="w-16 h-16 bg-gradient-to-tr from-amber-500 to-orange-500 text-white rounded-full flex items-center justify-center text-3xl shadow-xl active:scale-95 animate-bounce">
+                            <i class="fa-solid fa-volume-high"></i>
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="catch-options"></div>
+                </div>
+            `;
+
+            const grid = document.getElementById('catch-options');
+            choices.forEach(choice => {
+                const btn = document.createElement('button');
+                btn.className = "p-4 sm:p-5 bg-white rounded-3xl border-4 border-amber-200 shadow-md active:scale-95 hover:border-amber-500 hover:shadow-lg transition-all flex items-center gap-4 text-left group";
+                btn.onclick = () => checkCatchAnswer(choice.word, currentGameWord.word, btn);
+                btn.innerHTML = `
+                    <span class="w-14 h-14 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center text-3xl shadow-inner group-hover:bg-amber-500 group-hover:text-white transition-colors shrink-0">${choice.emoji}</span>
+                    <div>
+                        <span class="text-[10px] font-bold text-amber-800 uppercase block mb-0.5">${choice.category}</span>
+                        <span class="clear-word-font text-3xl sm:text-4xl text-slate-900">${choice.word}</span>
+                    </div>
+                `;
+                grid.appendChild(btn);
+            });
+        }
+
+        function checkCatchAnswer(selected, correct, btn) {
+            document.querySelectorAll('#catch-options button').forEach(b => b.disabled = true);
+            if (selected === correct) {
+                playSound('success');
+                btn.className = "p-4 sm:p-5 bg-emerald-100 rounded-3xl border-4 border-emerald-500 shadow-lg flex items-center gap-4 text-left ring-4 ring-emerald-200";
+                gameScore += 15 + (gameStreak * 5);
+                gameStreak++;
+            } else {
+                playSound('error');
+                btn.className = "p-4 sm:p-5 bg-rose-100 rounded-3xl border-4 border-rose-500 shadow-lg flex items-center gap-4 text-left ring-4 ring-rose-200";
+                gameStreak = 0;
+            }
+            setTimeout(() => { currentGameIndex++; loadGameStage(); }, 1200);
+        }
+
+        // GAME 2: BUBBLE POP MATCH
+        function renderBubbleGame(container) {
+            speakWord(currentGameWord.word);
+            let distractors = wordsData.filter(w => w.word !== currentGameWord.word).sort(() => Math.random() - 0.5).slice(0, 3);
+            let bubbles = [...distractors, currentGameWord].sort(() => Math.random() - 0.5);
+
+            container.innerHTML = `
+                <div class="space-y-5">
+                    <div class="p-4 bg-pink-100 rounded-3xl border-3 border-pink-300 flex items-center justify-between shadow-inner">
+                        <span class="text-xs font-bold text-pink-900 uppercase">Pop the bubble matching sound:</span>
+                        <button onclick="speakWord('${currentGameWord.word}')" class="px-4 py-2 bg-pink-600 text-white rounded-2xl font-bold shadow-md flex items-center gap-2 active:scale-95 text-xs">
+                            <i class="fa-solid fa-volume-high"></i> Replay
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4" id="bubble-grid"></div>
+                </div>
+            `;
+
+            const grid = document.getElementById('bubble-grid');
+            bubbles.forEach(bData => {
+                const b = document.createElement('button');
+                b.className = "p-5 bg-gradient-to-br from-pink-400 to-fuchsia-500 text-white rounded-3xl aspect-square shadow-xl active:scale-95 hover:scale-105 transition-all flex flex-col items-center justify-center text-center border-4 border-white group animate-pulse";
+                b.onclick = () => checkBubbleAnswer(bData.word, currentGameWord.word, b);
+                b.innerHTML = `
+                    <span class="text-3xl mb-1">${bData.emoji}</span>
+                    <span class="clear-word-font text-2xl sm:text-3xl tracking-tight drop-shadow-md">${bData.word}</span>
+                `;
+                grid.appendChild(b);
+            });
+        }
+
+        function checkBubbleAnswer(selected, correct, btn) {
+            document.querySelectorAll('#bubble-grid button').forEach(b => b.disabled = true);
+            if (selected === correct) {
+                playSound('success');
+                btn.className = "p-5 bg-emerald-500 text-white rounded-3xl aspect-square shadow-xl scale-105 flex flex-col items-center justify-center text-center border-4 border-emerald-200 ring-4 ring-emerald-300";
+                gameScore += 20 + (gameStreak * 5);
+                gameStreak++;
+            } else {
+                playSound('error');
+                btn.className = "p-5 bg-rose-500 text-white rounded-3xl aspect-square shadow-xl flex flex-col items-center justify-center text-center border-4 border-rose-200 ring-4 ring-rose-300";
+                gameStreak = 0;
+            }
+            setTimeout(() => { currentGameIndex++; loadGameStage(); }, 1200);
+        }
+
+        // GAME 3: MEMORY FLIP CARDS
+        function renderFlashcardGame(container) {
+            speakWord(currentGameWord.word);
+            let distractors = wordsData.filter(w => w.word !== currentGameWord.word).sort(() => Math.random() - 0.5).slice(0, 1);
+            let options = [...distractors, currentGameWord].sort(() => Math.random() - 0.5);
+
+            container.innerHTML = `
+                <div class="space-y-5 text-center">
+                    <p class="text-xs font-bold text-emerald-900 uppercase tracking-widest bg-emerald-100 py-2.5 rounded-2xl">Tap the card matching the spoken word!</p>
+                    <button onclick="speakWord('${currentGameWord.word}')" class="w-16 h-16 bg-emerald-600 text-white rounded-full mx-auto flex items-center justify-center text-2xl shadow-lg active:scale-95">
+                        <i class="fa-solid fa-volume-high"></i>
+                    </button>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-md mx-auto" id="flash-grid"></div>
+                </div>
+            `;
+
+            const grid = document.getElementById('flash-grid');
+            options.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "bg-white p-6 rounded-3xl border-4 border-emerald-300 shadow-xl active:scale-95 hover:scale-105 cursor-pointer transition-all flex flex-col items-center text-center group";
+                card.onclick = () => checkFlashAnswer(item.word, currentGameWord.word, card);
+                card.innerHTML = `
+                    <div class="text-5xl mb-3 group-hover:scale-110 transition-transform">${item.emoji}</div>
+                    <span class="clear-word-font text-4xl sm:text-5xl text-slate-900">${item.word}</span>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function checkFlashAnswer(selected, correct, card) {
+            if (selected === correct) {
+                playSound('success');
+                card.className = "bg-emerald-100 p-6 rounded-3xl border-4 border-emerald-500 shadow-xl flex flex-col items-center text-center ring-4 ring-emerald-300";
+                gameScore += 15 + (gameStreak * 5);
+                gameStreak++;
+                setTimeout(() => { currentGameIndex++; loadGameStage(); }, 1200);
+            } else {
+                playSound('error');
+                card.className = "bg-rose-100 p-6 rounded-3xl border-4 border-rose-500 shadow-xl flex flex-col items-center text-center ring-4 ring-rose-300";
+                gameStreak = 0;
+            }
+        }
+
+        // GAME 4: SPEED QUIZ BLITZ
+        function renderSpeedGame(container) {
+            let isTrue = Math.random() > 0.5;
+            let displayWord = currentGameWord.word;
+            if (!isTrue) {
+                let other = wordsData.filter(w => w.word !== currentGameWord.word);
+                displayWord = other[Math.floor(Math.random() * other.length)].word;
+            }
+            speakWord(currentGameWord.word);
+
+            container.innerHTML = `
+                <div class="space-y-5 max-w-md mx-auto text-center">
+                    <div class="p-6 bg-blue-50 rounded-3xl border-4 border-blue-300 shadow-lg space-y-3">
+                        <span class="text-xs font-bold text-blue-700 uppercase bg-white px-3 py-1 rounded-full shadow-xs">Does Audio Match Word?</span>
+                        <div class="text-5xl">${currentGameWord.emoji}</div>
+                        <h3 class="clear-word-font text-4xl sm:text-5xl text-slate-900 tracking-tight">"${displayWord}"</h3>
+                        <button onclick="speakWord('${currentGameWord.word}')" class="text-xs font-bold text-blue-600 bg-white px-3.5 py-1.5 rounded-xl shadow-xs inline-flex items-center gap-1 active:scale-95">
+                            <i class="fa-solid fa-volume-high"></i> Replay Audio
+                        </button>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <button onclick="checkSpeedAnswer(true, ${isTrue})" class="p-4 bg-emerald-500 text-white rounded-2xl fun-font font-bold text-xl shadow-lg active:scale-95 transition-all border-b-4 border-emerald-700">
+                            <i class="fa-solid fa-check mr-2"></i> YES
+                        </button>
+                        <button onclick="checkSpeedAnswer(false, ${isTrue})" class="p-4 bg-rose-500 text-white rounded-2xl fun-font font-bold text-xl shadow-lg active:scale-95 transition-all border-b-4 border-rose-700">
+                            <i class="fa-solid fa-xmark mr-2"></i> NO
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function checkSpeedAnswer(userChoice, actualMatch) {
+            if (userChoice === actualMatch) {
+                playSound('success');
+                gameScore += 20 + (gameStreak * 5);
+                gameStreak++;
+            } else {
+                playSound('error');
+                gameStreak = 0;
+            }
+            currentGameIndex++;
+            loadGameStage();
+        }
+
+        // GAME 5: LETTER PUZZLE BUILDER
+        function renderPuzzleGame(container) {
+            speakWord(currentGameWord.word);
+            let word = currentGameWord.word;
+            let scrambled = word.split('').sort(() => Math.random() - 0.5);
+
+            container.innerHTML = `
+                <div class="space-y-5 max-w-md mx-auto text-center">
+                    <div class="p-5 bg-purple-50 rounded-3xl border-4 border-purple-300 shadow-lg space-y-3">
+                        <span class="text-xs font-bold text-purple-700 uppercase bg-white px-3 py-1 rounded-full shadow-xs">Assemble the Puzzle</span>
+                        <div class="text-5xl">${currentGameWord.emoji}</div>
+                        <button onclick="speakWord('${currentGameWord.word}')" class="text-xs font-bold text-purple-600 bg-white px-3.5 py-1.5 rounded-xl shadow-xs inline-flex items-center gap-1 active:scale-95">
+                            <i class="fa-solid fa-volume-high"></i> Listen to Word
+                        </button>
+                    </div>
+                    <div class="flex justify-center gap-2 flex-wrap">
+                        ${scrambled.map(l => `<div class="w-10 h-12 bg-white text-purple-900 rounded-2xl clear-word-font font-bold flex items-center justify-center text-3xl shadow-md border-4 border-purple-300">${l}</div>`).join('')}
+                    </div>
+                    <div class="space-y-3">
+                        <input type="text" id="puzzle-input" placeholder="Type correct word..." class="w-full px-4 py-3.5 rounded-2xl border-4 border-purple-300 focus:border-purple-600 focus:outline-none text-center clear-word-font text-3xl sm:text-4xl text-slate-900 tracking-widest bg-white shadow-inner">
+                        <button onclick="checkPuzzleAnswer('${word}')" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-3.5 rounded-2xl shadow-lg active:scale-95 transition-all text-base">Submit Word</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function checkPuzzleAnswer(targetWord) {
+            let val = document.getElementById('puzzle-input').value.trim();
+            if (val.toLowerCase() === targetWord.toLowerCase()) {
+                playSound('success');
+                gameScore += 25 + (gameStreak * 5);
+                gameStreak++;
+                currentGameIndex++;
+                loadGameStage();
+            } else {
+                playSound('error');
+                gameStreak = 0;
+                showToast(false, "Not Quite!", `The correct spelling is "${targetWord}". Try the next round!`);
+                currentGameIndex++;
+                loadGameStage();
+            }
+        }
+
+        let currentExerciseItem = null;
+
+        function switchExerciseMode(mode) {
+            playSound('click');
+            currentExerciseMode = mode;
+            ['spell', 'missing', 'unscramble'].forEach(m => {
+                const btn = document.getElementById(`ex-btn-${m}`);
+                if (m === mode) {
+                    btn.className = "flex-1 sm:flex-initial px-3 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-md transition-all";
+                } else {
+                    btn.className = "flex-1 sm:flex-initial px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-slate-900 transition-all";
+                }
+            });
+            initExercise();
+        }
+
+        function initExercise() {
+            currentExerciseItem = wordsData[Math.floor(Math.random() * wordsData.length)];
+            const container = document.getElementById('exercise-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            if (currentExerciseMode === 'spell') {
+                renderListenAndSpell(container);
+            } else if (currentExerciseMode === 'missing') {
+                renderMissingLetters(container);
+            } else if (currentExerciseMode === 'unscramble') {
+                renderUnscramble(container);
+            }
+        }
+
+        function renderListenAndSpell(container) {
+            container.innerHTML = `
+                <div class="text-center space-y-5 py-2">
+                    <div class="w-24 h-24 bg-gradient-to-tr from-emerald-400 to-teal-500 text-white rounded-3xl flex items-center justify-center text-4xl mx-auto shadow-lg animate-pulse">
+                        ${currentExerciseItem.emoji}
+                    </div>
+                    <div>
+                        <h3 class="fun-font font-bold text-3xl text-slate-900">Listen & Spell</h3>
+                        <p class="text-slate-700 text-sm mt-1 font-medium">Listen to the word and type the exact spelling.</p>
+                    </div>
+                    <button onclick="speakWord('${currentExerciseItem.word}')" class="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold rounded-2xl shadow-lg active:scale-95 transition-all inline-flex items-center gap-2 text-sm">
+                        <i class="fa-solid fa-volume-high text-base"></i> Listen to Word
+                    </button>
+                    <div class="max-w-md mx-auto space-y-3">
+                        <input type="text" id="spell-input" placeholder="Type word here..." class="w-full px-4 py-3.5 rounded-2xl border-4 border-emerald-300 focus:border-emerald-600 focus:outline-none text-center clear-word-font text-3xl sm:text-4xl text-slate-900 tracking-widest bg-white shadow-inner">
+                        <button onclick="checkSpellAnswer()" class="w-full bg-slate-900 text-white font-bold py-3.5 rounded-2xl shadow-lg active:scale-95 transition-all text-base">Submit Answer</button>
+                    </div>
+                </div>
+            `;
+            speakWord(currentExerciseItem.word);
+        }
+
+        function checkSpellAnswer() {
+            const inputVal = document.getElementById('spell-input').value.trim();
+            if (inputVal.toLowerCase() === currentExerciseItem.word.toLowerCase()) {
+                playSound('success');
+                showToast(true, "Correct! 🎉", `You spelled "${currentExerciseItem.word}" perfectly!`, true);
+            } else {
+                playSound('error');
+                showToast(false, "Incorrect 💡", `You typed "${inputVal}". The correct spelling is "${currentExerciseItem.word}".`, true);
+            }
+        }
+
+        function renderMissingLetters(container) {
+            const word = currentExerciseItem.word;
+            let maskedArr = word.split('').map((char) => {
+                if (char === ' ') return ' ';
+                return Math.random() < 0.4 ? '_' : char;
+            });
+            if (!maskedArr.includes('_')) {
+                let validIndices = [];
+                word.split('').forEach((c, i) => { if (c !== ' ') validIndices.push(i); });
+                if (validIndices.length > 0) {
+                    let randIdx = validIndices[Math.floor(Math.random() * validIndices.length)];
+                    maskedArr[randIdx] = '_';
+                }
+            }
+
+            container.innerHTML = `
+                <div class="text-center space-y-5 py-2">
+                    <div class="w-24 h-24 bg-gradient-to-tr from-emerald-400 to-teal-500 text-white rounded-3xl flex items-center justify-center text-4xl mx-auto shadow-lg">
+                        ${currentExerciseItem.emoji}
+                    </div>
+                    <div>
+                        <h3 class="fun-font font-bold text-3xl text-slate-900">Missing Letters</h3>
+                        <p class="text-slate-700 text-sm mt-1 font-medium">Fill in the blanks to complete the word.</p>
+                    </div>
+                    <div id="missing-display" class="flex justify-center items-center gap-2 flex-wrap py-2">
+                        ${maskedArr.map((c, i) => c === '_' ? `<input type="text" maxlength="1" data-index="${i}" class="missing-input w-10 h-12 text-center rounded-2xl border-4 border-emerald-400 bg-white text-emerald-900 focus:outline-none focus:border-emerald-600 clear-word-font text-3xl shadow-md" />` : `<span class="w-10 h-12 flex items-center justify-center text-slate-900 bg-emerald-100 rounded-2xl shadow-xs clear-word-font text-3xl">${c}</span>`).join('')}
+                    </div>
+                    <button onclick="checkMissingAnswer('${word}')" class="w-full max-w-md mx-auto block bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold py-3.5 rounded-2xl shadow-lg active:scale-95 transition-all text-base">Check Letters</button>
+                </div>
+            `;
+        }
+
+        function checkMissingAnswer(targetWord) {
+            let inputs = document.querySelectorAll('.missing-input');
+            let fullWordArr = targetWord.split('');
+            let isCorrect = true;
+
+            inputs.forEach(input => {
+                let idx = parseInt(input.getAttribute('data-index'));
+                if (input.value.toLowerCase() !== fullWordArr[idx].toLowerCase()) {
+                    isCorrect = false;
+                }
+            });
+
+            if (isCorrect) {
+                playSound('success');
+                showToast(true, "Spot On! 🌟", `You completed "${targetWord}" successfully!`, true);
+            } else {
+                playSound('error');
+                showToast(false, "Try Again! 💡", `Some letters were incorrect for "${targetWord}".`, true);
+            }
+        }
+
+        function renderUnscramble(container) {
+            const word = currentExerciseItem.word;
+            let letters = word.split('').sort(() => Math.random() - 0.5);
+            if (letters.join('') === word && word.length > 1) {
+                letters.sort(() => Math.random() - 0.5);
+            }
+
+            container.innerHTML = `
+                <div class="text-center space-y-5 py-2">
+                    <div class="w-24 h-24 bg-gradient-to-tr from-emerald-400 to-teal-500 text-white rounded-3xl flex items-center justify-center text-4xl mx-auto shadow-lg">
+                        ${currentExerciseItem.emoji}
+                    </div>
+                    <div>
+                        <h3 class="fun-font font-bold text-3xl text-slate-900">Unscramble the Word</h3>
+                        <p class="text-slate-700 text-sm mt-1 font-medium">Rearrange the scrambled letters into the correct order.</p>
+                    </div>
+                    <div class="flex justify-center gap-2 flex-wrap">
+                        ${letters.map(l => `<div class="w-10 h-12 bg-white text-emerald-900 rounded-2xl clear-word-font font-bold flex items-center justify-center text-3xl shadow-md border-4 border-emerald-300">${l}</div>`).join('')}
+                    </div>
+                    <div class="max-w-md mx-auto space-y-3">
+                        <input type="text" id="unscramble-input" placeholder="Type unscrambled word..." class="w-full px-4 py-3.5 rounded-2xl border-4 border-emerald-300 focus:border-emerald-600 focus:outline-none text-center clear-word-font text-3xl sm:text-4xl text-slate-900 tracking-widest bg-white shadow-inner">
+                        <button onclick="checkUnscrambleAnswer('${word}')" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold py-3.5 rounded-2xl shadow-lg active:scale-95 transition-all text-base">Submit Answer</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function checkUnscrambleAnswer(targetWord) {
+            const val = document.getElementById('unscramble-input').value.trim();
+            if (val.toLowerCase() === targetWord.toLowerCase()) {
+                playSound('success');
+                showToast(true, "Unscrambled! 🏆", `You correctly formed "${targetWord}"!`, true);
+            } else {
+                playSound('error');
+                showToast(false, "Not quite! 💡", `That wasn't correct. The word was "${targetWord}".`, true);
+            }
+        }
+
+        function showToast(isSuccess, title, desc, reloadExercise = false) {
+            const modal = document.getElementById('feedback-modal');
+            const icon = document.getElementById('modal-icon');
+            const titleEl = document.getElementById('modal-title');
+            const descEl = document.getElementById('modal-desc');
+
+            if (isSuccess) {
+                icon.className = "w-20 h-20 rounded-full mx-auto flex items-center justify-center text-4xl shadow-inner bg-emerald-100 text-emerald-600";
+                icon.innerHTML = "🎉";
+            } else {
+                icon.className = "w-20 h-20 rounded-full mx-auto flex items-center justify-center text-4xl shadow-inner bg-rose-100 text-rose-600";
+                icon.innerHTML = "💡";
+            }
+
+            titleEl.innerText = title;
+            descEl.innerText = desc;
+            modal.classList.remove('hidden');
+            modal.dataset.reload = reloadExercise ? "true" : "false";
+        }
+
+        function closeModal() {
+            playSound('click');
+            const modal = document.getElementById('feedback-modal');
+            modal.classList.add('hidden');
+            if (modal.dataset.reload === "true") {
+                initExercise();
+            }
+        }
+
+        function showShareModal() {
+            playSound('click');
+            const currentUrl = window.location.href;
+            document.getElementById('share-link-input').value = currentUrl;
+            document.getElementById('direct-open-link').href = currentUrl;
+            document.getElementById('share-modal').classList.remove('hidden');
+        }
+
+        function closeShareModal() {
+            playSound('click');
+            document.getElementById('share-modal').classList.add('hidden');
+        }
+
+        function copyShareLink() {
+            playSound('success');
+            const copyText = document.getElementById('share-link-input');
+            copyText.select();
+            copyText.setSelectionRange(0, 99999);
+            document.execCommand('copy');
+            alert("Hyperlink copied! You can now share it with your students via WhatsApp, email, or chat.");
+        }
+
+        window.onload = function() {
+            renderListenGrid();
+            if ('speechSynthesis' in window) {
+                loadVoices();
+                // Unlock speech engine and audio context on first user touch/click for mobile browsers
+                window.addEventListener('click', () => {
+                    if (audioCtx.state === 'suspended') {
+                        audioCtx.resume();
+                    }
+                    if (availableVoices.length === 0) loadVoices();
+                }, { once: true });
+                window.addEventListener('touchstart', () => {
+                    if (audioCtx.state === 'suspended') {
+                        audioCtx.resume();
+                    }
+                    if (availableVoices.length === 0) loadVoices();
+                }, { once: true });
+            }
+        };
+    </script>
+</body>
+</html>
